@@ -19,6 +19,7 @@ FARBEN = {
     "Doppelte Geometrie": "#e74c3c",
     "Lücke im Netz": "#f39c12",
     "Leeres Pflichtfeld": "#2980b9",
+    "Armatur nicht auf Leitung": "#c0392b",
 }
 
 
@@ -67,6 +68,13 @@ class NetzQAPlugin:
             errors += checks.check_gaps(layer, d.tolerance.value())
         if d.chk_fields.isChecked():
             errors += checks.check_empty_fields(layer, d.field_combo.checkedItems())
+        if d.chk_points.isChecked() and d.chk_points.isEnabled():
+            line_layer = d.line_combo.currentLayer()
+            if line_layer is None:
+                d.summary.setText("Bitte einen Leitungslayer auswählen.")
+                return
+            errors += checks.check_points_on_lines(layer, line_layer,
+                                                   d.point_tolerance.value())
 
         self.errors = errors
         d.show_errors(errors)

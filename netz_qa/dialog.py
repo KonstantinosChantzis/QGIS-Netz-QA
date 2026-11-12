@@ -9,8 +9,10 @@ from qgis.core import QgsMapLayerProxyModel
 try:  # QGIS >= 3.34
     from qgis.core import Qgis
     VECTOR_FILTER = Qgis.LayerFilter.VectorLayer
+    LINE_FILTER = Qgis.LayerFilter.LineLayer
 except AttributeError:
     VECTOR_FILTER = QgsMapLayerProxyModel.VectorLayer
+    LINE_FILTER = QgsMapLayerProxyModel.LineLayer
 
 
 class NetzQADialog(QDialog):
@@ -30,7 +32,9 @@ class NetzQADialog(QDialog):
         self.chk_dupl = QCheckBox("Doppelte Geometrien")
         self.chk_gaps = QCheckBox("Lücken zwischen Leitungen (nur Linien)")
         self.chk_fields = QCheckBox("Leere Pflichtfelder")
-        for c in (self.chk_invalid, self.chk_dupl, self.chk_gaps, self.chk_fields):
+        self.chk_points = QCheckBox("Armaturen auf Leitung (nur Punkte)")
+        for c in (self.chk_invalid, self.chk_dupl, self.chk_gaps, self.chk_fields,
+                  self.chk_points):
             c.setChecked(True)
             form.addRow(c)
 
@@ -40,6 +44,17 @@ class NetzQADialog(QDialog):
         self.tolerance.setValue(1.0)
         self.tolerance.setSuffix(" m")
         form.addRow("Toleranz für Lücken:", self.tolerance)
+
+        self.line_combo = QgsMapLayerComboBox()
+        self.line_combo.setFilters(LINE_FILTER)
+        form.addRow("Leitungslayer:", self.line_combo)
+
+        self.point_tolerance = QgsDoubleSpinBox()
+        self.point_tolerance.setDecimals(3)
+        self.point_tolerance.setRange(0.0, 100.0)
+        self.point_tolerance.setValue(0.01)
+        self.point_tolerance.setSuffix(" m")
+        form.addRow("Toleranz für Armaturen:", self.point_tolerance)
 
         self.field_combo = QgsCheckableComboBox()
         form.addRow("Pflichtfelder:", self.field_combo)
@@ -73,13 +88,17 @@ class NetzQADialog(QDialog):
         if layer is None:
             return
         self.field_combo.addItems([f.name() for f in layer.fields()])
-        is_line = False
+        is_line = is_point = False
         try:
-            from .checks import GT_LINE
+            from .checks import GT_LINE, GT_POINT
             is_line = layer.geometryType() == GT_LINE
+            is_point = layer.geometryType() == GT_POINT
         except Exception:
             pass
         self.chk_gaps.setEnabled(is_line)
+        self.chk_points.setEnabled(is_point)
+        self.line_combo.setEnabled(is_point)
+        self.point_tolerance.setEnabled(is_point)
 
     def show_errors(self, errors):
         self.table.setRowCount(len(errors))

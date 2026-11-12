@@ -123,3 +123,27 @@ def check_empty_fields(layer, field_names, feedback=None):
             errors.append(("Leeres Pflichtfeld", f.id(), _point_of(f.geometry()),
                            "Leer: " + ", ".join(empty)))
     return errors
+
+
+def check_points_on_lines(point_layer, line_layer, tolerance, feedback=None):
+    """Armaturen (Punkte), die nicht auf einer Leitung liegen."""
+    errors = []
+    if point_layer.geometryType() != GT_POINT or line_layer.geometryType() != GT_LINE:
+        return errors
+    lines = {f.id(): f.geometry() for f in line_layer.getFeatures()
+             if f.geometry() is not None and not f.geometry().isEmpty()}
+    if not lines:
+        return errors
+    index = QgsSpatialIndex()
+    for fid, g in lines.items():
+        index.addFeature(fid, g.boundingBox())
+    for f in point_layer.getFeatures():
+        pg = f.geometry()
+        if pg is None or pg.isEmpty():
+            continue
+        candidates = index.nearestNeighbor(pg.centroid().asPoint(), 5)
+        dist, line_id = min((lines[i].distance(pg), i) for i in candidates)
+        if dist > tolerance:
+            errors.append(("Armatur nicht auf Leitung", f.id(), QgsGeometry(pg),
+                           f"Armatur liegt {dist:.2f} m neben Leitung {line_id}"))
+    return errors

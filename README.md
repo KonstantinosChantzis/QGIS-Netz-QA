@@ -16,6 +16,7 @@
 | **Duplicate geometries** | Two or more features with exactly the same geometry (e.g. a pipe digitised twice) |
 | **Gaps in the network** (lines only) | Line ends that lie closer than a tolerance (e.g. 1 m) to another line but do not touch it – typical digitising errors. Real network ends further away are **not** reported. |
 | **Empty required fields** | Features where selected attributes (e.g. material, diameter) are empty |
+| **Valves not on a pipe** (points only) | Point features (valves, hydrants, nodes) that lie further than a tolerance (e.g. 0.01 m) from the nearest line of a selected pipe layer |
 
 ## Test result
 
@@ -26,6 +27,12 @@ The repository contains a test network (13 pipes in Essen, EPSG:25832) with buil
 | Duplicate geometry | 1 | Pipe 10 = copy of pipe 6 |
 | Gap in the network | 2 | 0.60 m and 0.40 m |
 | Empty required field | 3 | material and/or diameter missing |
+
+**Point check:** a second test layer `testdata/armaturen.gpkg` contains 8 valves – 5 snapped exactly onto pipes and 3 placed next to them. With a tolerance of 0.01 m Netz-QA found exactly the **3 misplaced valves** (2.76 m, 7.04 m and 43.04 m away); with a tolerance of 5 m only the 2 valves further away were reported.
+
+![Netz-QA point check: valves not on a pipe (tolerance 0.01 m)](images/02_armaturen_check.png)
+
+![Netz-QA point check with tolerance 5 m](images/03_armaturen_check_5m.png)
 
 ---
 
@@ -40,8 +47,9 @@ Requirements: QGIS 3.28 or newer (prepared for QGIS 4 / Qt6).
 
 ## Usage
 
-1. Load a network layer (or `testdata/netz_testdaten.gpkg`)
+1. Load a network layer (or `testdata/netz_testdaten.gpkg` and `testdata/armaturen.gpkg`)
 2. Open Netz-QA, choose the layer, the checks, the gap tolerance and the required fields
+   – for the point check: choose a point layer, the pipe layer and the valve tolerance
 3. Click **Prüfung starten** (start check)
 4. Double-click a row in the table to zoom to the error
 
@@ -51,13 +59,14 @@ Requirements: QGIS 3.28 or newer (prepared for QGIS 4 / Qt6).
 
 - **PyQGIS**: QgsSpatialIndex for fast neighbour search, GEOS-based validity and equality checks
 - **Gap detection**: for each line end, the nearest other line within the tolerance is searched; if it is not touched, a gap is reported (each pair only once)
+- **Point check**: for each point, the nearest pipes are found with the spatial index and the exact distance to each is measured; if the smallest distance is larger than the tolerance, an error is reported
 - **User interface**: Qt dialog written in Python (QgsMapLayerComboBox, QgsCheckableComboBox, QTableWidget)
 - **Output**: temporary memory point layer with categorised symbols per error type
 - Compatible with QGIS 3.x and 4.x (enum handling for both versions)
 
 ## Roadmap
 
-- Topology checks for point layers (nodes / valves not on a pipe)
+- ~~Topology checks for point layers (valves not on a pipe)~~ – done in version 0.2.0
 - Export of the error list to Excel / GeoPackage
 - Processing algorithm so the checks can be used in models and batch runs
 - Publication in the official QGIS Plugin Repository
@@ -76,9 +85,12 @@ QGIS-Netz-QA/
 │   ├── metadata.txt     # plugin metadata
 │   └── icon.png
 ├── testdata/
-│   └── netz_testdaten.gpkg
+│   ├── netz_testdaten.gpkg   # 13 pipes
+│   └── armaturen.gpkg        # 8 valves
 ├── images/
-│   └── 01_netz_qa_result.png
+│   ├── 01_netz_qa_result.png
+│   ├── 02_armaturen_check.png
+│   └── 03_armaturen_check_5m.png
 ├── LICENSE
 └── README.md
 ```
@@ -112,6 +124,7 @@ MIT License – see [LICENSE](LICENSE)
 | **Doppelte Geometrien** | Zwei oder mehr Objekte mit exakt gleicher Geometrie (z. B. doppelt digitalisierte Leitung) |
 | **Lücken im Netz** (nur Linien) | Leitungsenden, die näher als eine Toleranz (z. B. 1 m) an einer anderen Leitung liegen, sie aber nicht berühren – typische Digitalisierfehler. Echte, weiter entfernte Netzenden werden **nicht** gemeldet. |
 | **Leere Pflichtfelder** | Objekte, bei denen ausgewählte Attribute (z. B. Material, Durchmesser) leer sind |
+| **Armaturen nicht auf Leitung** (nur Punkte) | Punktobjekte (Armaturen, Hydranten, Knoten), die weiter als eine Toleranz (z. B. 0,01 m) von der nächsten Leitung eines gewählten Leitungslayers entfernt liegen |
 
 ## Testergebnis
 
@@ -122,6 +135,12 @@ Das Repository enthält ein Testnetz (13 Leitungen in Essen, EPSG:25832) mit ein
 | Doppelte Geometrie | 1 | Leitung 10 = Kopie von Leitung 6 |
 | Lücke im Netz | 2 | 0,60 m und 0,40 m |
 | Leeres Pflichtfeld | 3 | Material und/oder Durchmesser fehlt |
+
+**Punktprüfung:** Ein zweiter Testlayer `testdata/armaturen.gpkg` enthält 8 Armaturen – 5 exakt auf Leitungen gefangen, 3 daneben gesetzt. Mit einer Toleranz von 0,01 m hat Netz-QA genau die **3 falsch liegenden Armaturen** gefunden (2,76 m, 7,04 m und 43,04 m entfernt); mit 5 m Toleranz nur die 2 weiter entfernten.
+
+![Netz-QA Punktprüfung: Armaturen nicht auf Leitung (Toleranz 0,01 m)](images/02_armaturen_check.png)
+
+![Netz-QA Punktprüfung mit Toleranz 5 m](images/03_armaturen_check_5m.png)
 
 ---
 
@@ -136,8 +155,9 @@ Voraussetzung: QGIS 3.28 oder neuer (vorbereitet für QGIS 4 / Qt6).
 
 ## Bedienung
 
-1. Netzlayer laden (oder `testdata/netz_testdaten.gpkg`)
+1. Netzlayer laden (oder `testdata/netz_testdaten.gpkg` und `testdata/armaturen.gpkg`)
 2. Netz-QA öffnen, Layer, Prüfungen, Toleranz für Lücken und Pflichtfelder wählen
+   – für die Punktprüfung: Punktlayer, Leitungslayer und Toleranz für Armaturen wählen
 3. **Prüfung starten** klicken
 4. Doppelklick auf eine Zeile der Tabelle zoomt zum Fehler
 
@@ -147,13 +167,14 @@ Voraussetzung: QGIS 3.28 oder neuer (vorbereitet für QGIS 4 / Qt6).
 
 - **PyQGIS**: QgsSpatialIndex für schnelle Nachbarsuche, GEOS-basierte Gültigkeits- und Gleichheitsprüfung
 - **Lückenerkennung**: Für jedes Leitungsende wird die nächste andere Leitung innerhalb der Toleranz gesucht; wird sie nicht berührt, wird eine Lücke gemeldet (jedes Paar nur einmal)
+- **Punktprüfung**: Für jeden Punkt werden mit dem räumlichen Index die nächsten Leitungen gesucht und der genaue Abstand gemessen; ist der kleinste Abstand größer als die Toleranz, wird ein Fehler gemeldet
 - **Benutzeroberfläche**: Qt-Dialog in Python (QgsMapLayerComboBox, QgsCheckableComboBox, QTableWidget)
 - **Ausgabe**: temporärer Punktlayer mit kategorisierten Symbolen je Fehlertyp
 - Kompatibel mit QGIS 3.x und 4.x
 
 ## Weiterentwicklung
 
-- Topologieprüfung für Punktlayer (Knoten / Armaturen nicht auf einer Leitung)
+- ~~Topologieprüfung für Punktlayer (Armaturen nicht auf einer Leitung)~~ – erledigt in Version 0.2.0
 - Export der Fehlerliste nach Excel / GeoPackage
 - Processing-Algorithmus für Modelle und Stapelverarbeitung
 - Veröffentlichung im offiziellen QGIS-Plugin-Repository

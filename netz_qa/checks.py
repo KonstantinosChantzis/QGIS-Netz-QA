@@ -1,6 +1,7 @@
 """Pruefroutinen von Netz-QA. Jede Funktion gibt eine Liste von Fehlern zurueck:
 (fehler_typ, feature_id, QgsGeometry fuer die Fehlerstelle, beschreibung)
 """
+from .i18n import tr
 from qgis.core import (
     QgsFeatureRequest, QgsGeometry, QgsPointXY, QgsSpatialIndex, QgsWkbTypes,
 )
@@ -30,11 +31,11 @@ def check_invalid(layer, feedback=None):
     for f in layer.getFeatures():
         g = f.geometry()
         if g is None or g.isEmpty():
-            errors.append(("Leere Geometrie", f.id(), None, "Objekt hat keine Geometrie"))
+            errors.append((tr("Leere Geometrie"), f.id(), None, tr("Objekt hat keine Geometrie")))
             continue
         if not g.isGeosValid():
-            errors.append(("Ungültige Geometrie", f.id(), _point_of(g),
-                           "Geometrie ist nach GEOS ungültig"))
+            errors.append((tr("Ungültige Geometrie"), f.id(), _point_of(g),
+                           tr("Geometrie ist nach GEOS ungültig")))
     return errors
 
 
@@ -52,8 +53,8 @@ def check_duplicates(layer, feedback=None):
             og = geoms.get(other)
             if og is not None and g.isGeosEqual(og):
                 reported.add(other)
-                errors.append(("Doppelte Geometrie", other, _point_of(og),
-                               f"Gleiche Geometrie wie Objekt {fid}"))
+                errors.append((tr("Doppelte Geometrie"), other, _point_of(og),
+                               tr("Gleiche Geometrie wie Objekt {fid}", fid=fid)))
     return errors
 
 
@@ -102,9 +103,9 @@ def check_gaps(layer, tolerance, feedback=None):
                 if pair in seen_pairs:
                     continue
                 seen_pairs.add(pair)
-                errors.append(("Lücke im Netz", fid, pg,
-                               f"Ende liegt {nearest[1]:.2f} m neben Objekt {nearest[0]}, "
-                               f"ist aber nicht verbunden"))
+                errors.append((tr("Lücke im Netz"), fid, pg,
+                               tr("Ende liegt {d:.2f} m neben Objekt {other}, ist aber nicht verbunden",
+                                  d=nearest[1], other=nearest[0])))
     return errors
 
 
@@ -120,8 +121,8 @@ def check_empty_fields(layer, field_names, feedback=None):
             if v is None or (hasattr(v, "isNull") and v.isNull()) or str(v).strip() in ("", "NULL"):
                 empty.append(name)
         if empty:
-            errors.append(("Leeres Pflichtfeld", f.id(), _point_of(f.geometry()),
-                           "Leer: " + ", ".join(empty)))
+            errors.append((tr("Leeres Pflichtfeld"), f.id(), _point_of(f.geometry()),
+                           tr("Leer: {names}", names=", ".join(empty))))
     return errors
 
 
@@ -144,6 +145,6 @@ def check_points_on_lines(point_layer, line_layer, tolerance, feedback=None):
         candidates = index.nearestNeighbor(pg.centroid().asPoint(), 5)
         dist, line_id = min((lines[i].distance(pg), i) for i in candidates)
         if dist > tolerance:
-            errors.append(("Armatur nicht auf Leitung", f.id(), QgsGeometry(pg),
-                           f"Armatur liegt {dist:.2f} m neben Leitung {line_id}"))
+            errors.append((tr("Armatur nicht auf Leitung"), f.id(), QgsGeometry(pg),
+                           tr("Armatur liegt {d:.2f} m neben Leitung {line}", d=dist, line=line_id)))
     return errors

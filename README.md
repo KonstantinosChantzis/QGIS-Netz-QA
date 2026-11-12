@@ -18,6 +18,12 @@
 | **Empty required fields** | Features where selected attributes (e.g. material, diameter) are empty |
 | **Valves not on a pipe** (points only) | Point features (valves, hydrants, nodes) that lie further than a tolerance (e.g. 0.01 m) from the nearest line of a selected pipe layer |
 
+**Processing:** all checks are also available as the algorithm **Netz-QA → Netzdaten prüfen** in the Processing Toolbox, so they can be used in the Model Designer and in batch processing.
+
+**Settings and language:** the selected checks and tolerances are remembered after restarting QGIS. The interface is shown in German when QGIS runs in German, otherwise in English.
+
+**Export:** the error list can be saved as **GeoPackage** (points with attributes, for QGIS), **Excel** (.xlsx) or **CSV** – with error type, feature ID, description and x/y coordinates.
+
 ## Test result
 
 The repository contains a test network (13 pipes in Essen, EPSG:25832) with built-in errors. Netz-QA found exactly the **6 expected errors** and no false positives:
@@ -33,6 +39,20 @@ The repository contains a test network (13 pipes in Essen, EPSG:25832) with buil
 ![Netz-QA point check: valves not on a pipe (tolerance 0.01 m)](images/02_armaturen_check.png)
 
 ![Netz-QA point check with tolerance 5 m](images/03_armaturen_check_5m.png)
+
+**Export test:** the 3 errors were exported to Excel and to GeoPackage. The GeoPackage points lie exactly on the error points in the map.
+
+![Error list exported to Excel](images/04_export_excel.png)
+
+![Error list exported to GeoPackage and loaded in QGIS](images/05_export_geopackage.png)
+
+**Processing test:** the algorithm *Netzdaten prüfen* found the same 3 errors (ERROR_COUNT = 3).
+
+![Netz-QA as Processing algorithm](images/06_processing_toolbox.png)
+
+**Language test:** with QGIS set to English, the whole plugin (dialog, error types, descriptions) is shown in English.
+
+![Netz-QA with English interface](images/07_english_interface.png)
 
 ---
 
@@ -52,6 +72,8 @@ Requirements: QGIS 3.28 or newer (prepared for QGIS 4 / Qt6).
    – for the point check: choose a point layer, the pipe layer and the valve tolerance
 3. Click **Prüfung starten** (start check)
 4. Double-click a row in the table to zoom to the error
+5. Click **Fehlerliste exportieren…** (export error list) and choose GeoPackage, Excel or CSV
+6. Alternatively: **Processing Toolbox → Netz-QA → Netzdaten prüfen**
 
 ---
 
@@ -62,13 +84,17 @@ Requirements: QGIS 3.28 or newer (prepared for QGIS 4 / Qt6).
 - **Point check**: for each point, the nearest pipes are found with the spatial index and the exact distance to each is measured; if the smallest distance is larger than the tolerance, an error is reported
 - **User interface**: Qt dialog written in Python (QgsMapLayerComboBox, QgsCheckableComboBox, QTableWidget)
 - **Output**: temporary memory point layer with categorised symbols per error type
+- **Export**: QgsVectorFileWriter (GPKG, XLSX, CSV drivers of GDAL/OGR)
+- **Processing**: own QgsProcessingProvider with a QgsProcessingAlgorithm (feature sink output, number output ERROR_COUNT)
+- **Settings**: QgsSettings; **translation**: German/English depending on the QGIS locale
 - Compatible with QGIS 3.x and 4.x (enum handling for both versions)
 
 ## Roadmap
 
 - ~~Topology checks for point layers (valves not on a pipe)~~ – done in version 0.2.0
-- Export of the error list to Excel / GeoPackage
-- Processing algorithm so the checks can be used in models and batch runs
+- ~~Export of the error list to Excel / GeoPackage~~ – done in version 0.3.0
+- ~~Processing algorithm so the checks can be used in models and batch runs~~ – done in version 0.4.0
+- ~~Saved settings and English translation~~ – done in version 0.5.0
 - Publication in the official QGIS Plugin Repository
 
 ---
@@ -79,7 +105,9 @@ Requirements: QGIS 3.28 or newer (prepared for QGIS 4 / Qt6).
 QGIS-Netz-QA/
 ├── netz_qa/
 │   ├── __init__.py      # plugin entry point
-│   ├── netz_qa.py       # main class: menu, toolbar, workflow, error layer
+│   ├── netz_qa.py       # main class: menu, toolbar, workflow, error layer, export
+│   ├── netz_qa_processing.py  # Processing provider and algorithm
+│   ├── i18n.py          # German / English texts
 │   ├── checks.py        # check functions
 │   ├── dialog.py        # user interface
 │   ├── metadata.txt     # plugin metadata
@@ -90,7 +118,11 @@ QGIS-Netz-QA/
 ├── images/
 │   ├── 01_netz_qa_result.png
 │   ├── 02_armaturen_check.png
-│   └── 03_armaturen_check_5m.png
+│   ├── 03_armaturen_check_5m.png
+│   ├── 04_export_excel.png
+│   ├── 05_export_geopackage.png
+│   ├── 06_processing_toolbox.png
+│   └── 07_english_interface.png
 ├── LICENSE
 └── README.md
 ```
@@ -126,6 +158,12 @@ MIT License – see [LICENSE](LICENSE)
 | **Leere Pflichtfelder** | Objekte, bei denen ausgewählte Attribute (z. B. Material, Durchmesser) leer sind |
 | **Armaturen nicht auf Leitung** (nur Punkte) | Punktobjekte (Armaturen, Hydranten, Knoten), die weiter als eine Toleranz (z. B. 0,01 m) von der nächsten Leitung eines gewählten Leitungslayers entfernt liegen |
 
+**Processing:** Alle Prüfungen gibt es auch als Algorithmus **Netz-QA → Netzdaten prüfen** in der Processing-Werkzeugkiste – nutzbar im Grafischen Modellierer und in der Stapelverarbeitung.
+
+**Einstellungen und Sprache:** Die gewählten Prüfungen und Toleranzen bleiben nach einem Neustart von QGIS erhalten. Die Oberfläche erscheint auf Deutsch, wenn QGIS auf Deutsch läuft, sonst auf Englisch.
+
+**Export:** Die Fehlerliste kann als **GeoPackage** (Punkte mit Attributen, für QGIS), **Excel** (.xlsx) oder **CSV** gespeichert werden – mit Fehlertyp, Objekt-ID, Beschreibung und x/y-Koordinaten.
+
 ## Testergebnis
 
 Das Repository enthält ein Testnetz (13 Leitungen in Essen, EPSG:25832) mit eingebauten Fehlern. Netz-QA hat genau die **6 erwarteten Fehler** gefunden, ohne Fehlalarme:
@@ -141,6 +179,20 @@ Das Repository enthält ein Testnetz (13 Leitungen in Essen, EPSG:25832) mit ein
 ![Netz-QA Punktprüfung: Armaturen nicht auf Leitung (Toleranz 0,01 m)](images/02_armaturen_check.png)
 
 ![Netz-QA Punktprüfung mit Toleranz 5 m](images/03_armaturen_check_5m.png)
+
+**Exporttest:** Die 3 Fehler wurden nach Excel und nach GeoPackage exportiert. Die GeoPackage-Punkte liegen genau auf den Fehlerpunkten in der Karte.
+
+![Fehlerliste als Excel exportiert](images/04_export_excel.png)
+
+![Fehlerliste als GeoPackage exportiert und in QGIS geladen](images/05_export_geopackage.png)
+
+**Processing-Test:** Der Algorithmus *Netzdaten prüfen* hat dieselben 3 Fehler gefunden (ERROR_COUNT = 3).
+
+![Netz-QA als Processing-Algorithmus](images/06_processing_toolbox.png)
+
+**Sprachtest:** Mit QGIS auf Englisch erscheint das ganze Plugin (Dialog, Fehlertypen, Beschreibungen) auf Englisch.
+
+![Netz-QA mit englischer Oberfläche](images/07_english_interface.png)
 
 ---
 
@@ -160,6 +212,8 @@ Voraussetzung: QGIS 3.28 oder neuer (vorbereitet für QGIS 4 / Qt6).
    – für die Punktprüfung: Punktlayer, Leitungslayer und Toleranz für Armaturen wählen
 3. **Prüfung starten** klicken
 4. Doppelklick auf eine Zeile der Tabelle zoomt zum Fehler
+5. **Fehlerliste exportieren…** klicken und GeoPackage, Excel oder CSV wählen
+6. Alternativ: **Processing-Werkzeugkiste → Netz-QA → Netzdaten prüfen**
 
 ---
 
@@ -170,13 +224,17 @@ Voraussetzung: QGIS 3.28 oder neuer (vorbereitet für QGIS 4 / Qt6).
 - **Punktprüfung**: Für jeden Punkt werden mit dem räumlichen Index die nächsten Leitungen gesucht und der genaue Abstand gemessen; ist der kleinste Abstand größer als die Toleranz, wird ein Fehler gemeldet
 - **Benutzeroberfläche**: Qt-Dialog in Python (QgsMapLayerComboBox, QgsCheckableComboBox, QTableWidget)
 - **Ausgabe**: temporärer Punktlayer mit kategorisierten Symbolen je Fehlertyp
+- **Export**: QgsVectorFileWriter (GPKG-, XLSX- und CSV-Treiber von GDAL/OGR)
+- **Processing**: eigener QgsProcessingProvider mit QgsProcessingAlgorithm (Ausgabelayer, Zahl ERROR_COUNT)
+- **Einstellungen**: QgsSettings; **Übersetzung**: Deutsch/Englisch je nach QGIS-Sprache
 - Kompatibel mit QGIS 3.x und 4.x
 
 ## Weiterentwicklung
 
 - ~~Topologieprüfung für Punktlayer (Armaturen nicht auf einer Leitung)~~ – erledigt in Version 0.2.0
-- Export der Fehlerliste nach Excel / GeoPackage
-- Processing-Algorithmus für Modelle und Stapelverarbeitung
+- ~~Export der Fehlerliste nach Excel / GeoPackage~~ – erledigt in Version 0.3.0
+- ~~Processing-Algorithmus für Modelle und Stapelverarbeitung~~ – erledigt in Version 0.4.0
+- ~~Gespeicherte Einstellungen und englische Übersetzung~~ – erledigt in Version 0.5.0
 - Veröffentlichung im offiziellen QGIS-Plugin-Repository
 
 ---

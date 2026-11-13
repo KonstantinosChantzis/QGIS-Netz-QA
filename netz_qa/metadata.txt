@@ -2,16 +2,16 @@
 name=Netz-QA
 qgisMinimumVersion=3.28
 qgisMaximumVersion=4.99
-supportsQt6=True
 description=Quality checks for utility network data (invalid and duplicate geometries, gaps, empty fields, valves not on a pipe) | Qualitätsprüfung für Netzdaten
 about=Netz-QA checks line and point layers of utility networks (pipes, cables, valves) for typical data errors: invalid and duplicate geometries, small gaps between lines that should be connected, empty required attributes and valves that do not lie on a pipe. Errors are listed in a table, shown as a point layer on the map and can be exported to GeoPackage, Excel or CSV. All checks are also available as a Processing algorithm (Toolbox, Model Designer, batch processing). Interface in German and English. | Netz-QA prüft Linien- und Punktlayer von Versorgungsnetzen auf typische Datenfehler: ungültige und doppelte Geometrien, kleine Lücken zwischen Leitungen, leere Pflichtattribute und Armaturen, die nicht auf einer Leitung liegen. Export nach GeoPackage, Excel oder CSV; auch als Processing-Algorithmus verfügbar.
-version=1.0.0
+version=1.0.1
 author=Konstantinos Chantzis
 email=costashantzis@gmail.com
 homepage=https://github.com/KonstantinosChantzis/QGIS-Netz-QA
 repository=https://github.com/KonstantinosChantzis/QGIS-Netz-QA
 tracker=https://github.com/KonstantinosChantzis/QGIS-Netz-QA/issues
-changelog=1.0.0 First release in the QGIS Plugin Repository
+changelog=1.0.1 Code cleanup for the security check (no try/except/pass)
+    1.0.0 First release in the QGIS Plugin Repository
     0.5.0 Settings are remembered, German/English interface
     0.4.0 Processing algorithm "Netzdaten prüfen"
     0.3.0 Export of the error list (GeoPackage, Excel, CSV)

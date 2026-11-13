@@ -114,13 +114,9 @@ class NetzQADialog(QDialog):
         if layer is None:
             return
         self.field_combo.addItems([f.name() for f in layer.fields()])
-        is_line = is_point = False
-        try:
-            from .checks import GT_LINE, GT_POINT
-            is_line = layer.geometryType() == GT_LINE
-            is_point = layer.geometryType() == GT_POINT
-        except Exception:
-            pass
+        from .checks import GT_LINE, GT_POINT
+        is_line = layer.geometryType() == GT_LINE
+        is_point = layer.geometryType() == GT_POINT
         self.chk_gaps.setEnabled(is_line)
         self.chk_points.setEnabled(is_point)
         self.line_combo.setEnabled(is_point)

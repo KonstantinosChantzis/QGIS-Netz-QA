@@ -10,6 +10,7 @@ from qgis.core import (
     QgsVectorFileWriter, QgsWkbTypes, QgsApplication,
 )
 from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt import sip
 
 from . import checks
 from .dialog import NetzQADialog
@@ -113,10 +114,10 @@ class NetzQAPlugin:
 
     def write_error_layer(self, layer, errors):
         if self.error_layer is not None:
-            try:
-                QgsProject.instance().removeMapLayer(self.error_layer.id())
-            except RuntimeError:
-                pass
+            # Layer nur entfernen, wenn er noch im Projekt ist (Nutzer kann ihn gelöscht haben)
+            layer_id = self.error_layer.id() if not sip.isdeleted(self.error_layer) else None
+            if layer_id and QgsProject.instance().mapLayer(layer_id) is not None:
+                QgsProject.instance().removeMapLayer(layer_id)
             self.error_layer = None
         if not errors:
             return

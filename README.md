@@ -2,6 +2,8 @@
 
 [English](#qgis-netz-qa--quality-checks-for-utility-network-data) | [Deutsch](#deutsch)
 
+**Available in the official QGIS Plugin Repository:** [plugins.qgis.org/plugins/netz_qa](https://plugins.qgis.org/plugins/netz_qa/) – install it directly in QGIS via *Plugins → Manage and Install Plugins → search "Netz-QA"*.
+
 **Netz-QA** is a QGIS plugin (Python / PyQGIS) that checks line and point layers of utility networks – water and gas pipes, cables, poles – for typical data errors with one click. All errors are listed in a table, shown as a coloured point layer on the map, and each error can be zoomed to with a double click.
 
 ![Netz-QA result: error layer on the map and error table](images/01_netz_qa_result.png)
@@ -58,10 +60,14 @@ The repository contains a test network (13 pipes in Essen, EPSG:25832) with buil
 
 ## Installation
 
+**Recommended:** QGIS → **Plugins → Manage and Install Plugins → All** → search **Netz-QA** → **Install Plugin**.
+
+Alternatively from this repository:
 1. Download this repository as ZIP (**Code → Download ZIP**) and unpack it
 2. Zip only the folder `netz_qa` (so that the ZIP contains `netz_qa/…`)
 3. QGIS → **Plugins → Manage and Install Plugins → Install from ZIP** → select the ZIP
-4. A green Netz-QA icon appears in the toolbar and under **Vector → Netz-QA**
+
+A green Netz-QA icon appears in the toolbar and under **Vector → Netz-QA**; the checks are also in the **Processing Toolbox → Netz-QA**.
 
 Requirements: QGIS 3.28 or newer (prepared for QGIS 4 / Qt6).
 
@@ -95,7 +101,7 @@ Requirements: QGIS 3.28 or newer (prepared for QGIS 4 / Qt6).
 - ~~Export of the error list to Excel / GeoPackage~~ – done in version 0.3.0
 - ~~Processing algorithm so the checks can be used in models and batch runs~~ – done in version 0.4.0
 - ~~Saved settings and English translation~~ – done in version 0.5.0
-- Publication in the official QGIS Plugin Repository
+- ~~Publication in the official QGIS Plugin Repository~~ – done in version 1.0.1 (November 2026)
 
 ---
 
@@ -108,6 +114,7 @@ QGIS-Netz-QA/
 │   ├── netz_qa.py       # main class: menu, toolbar, workflow, error layer, export
 │   ├── netz_qa_processing.py  # Processing provider and algorithm
 │   ├── i18n.py          # German / English texts
+│   ├── LICENSE          # required by the QGIS Plugin Repository
 │   ├── checks.py        # check functions
 │   ├── dialog.py        # user interface
 │   ├── metadata.txt     # plugin metadata
@@ -141,6 +148,8 @@ MIT License – see [LICENSE](LICENSE)
 # Deutsch
 
 [English](#qgis-netz-qa--quality-checks-for-utility-network-data) | [Deutsch](#deutsch)
+
+**Im offiziellen QGIS-Plugin-Repository verfügbar:** [plugins.qgis.org/plugins/netz_qa](https://plugins.qgis.org/plugins/netz_qa/) – direkt in QGIS installierbar über *Erweiterungen → Erweiterungen verwalten und installieren → Suche "Netz-QA"*.
 
 **Netz-QA** ist ein QGIS-Plugin (Python / PyQGIS), das Linien- und Punktlayer von Versorgungsnetzen – Wasser- und Gasleitungen, Kabel, Masten – mit einem Klick auf typische Datenfehler prüft. Alle Fehler werden in einer Tabelle aufgelistet, als farbiger Punktlayer in der Karte angezeigt und lassen sich per Doppelklick anzoomen.
 
@@ -198,10 +207,14 @@ Das Repository enthält ein Testnetz (13 Leitungen in Essen, EPSG:25832) mit ein
 
 ## Installation
 
+**Empfohlen:** QGIS → **Erweiterungen → Erweiterungen verwalten und installieren → Alle** → **Netz-QA** suchen → **Erweiterung installieren**.
+
+Alternativ aus diesem Repository:
 1. Repository als ZIP herunterladen (**Code → Download ZIP**) und entpacken
 2. Nur den Ordner `netz_qa` zippen (die ZIP-Datei muss `netz_qa/…` enthalten)
 3. QGIS → **Erweiterungen → Erweiterungen verwalten und installieren → Aus ZIP installieren** → ZIP auswählen
-4. In der Werkzeugleiste erscheint ein grünes Netz-QA-Symbol, außerdem unter **Vektor → Netz-QA**
+
+In der Werkzeugleiste erscheint ein grünes Netz-QA-Symbol, außerdem unter **Vektor → Netz-QA**; die Prüfungen gibt es auch in der **Processing-Werkzeugkiste → Netz-QA**.
 
 Voraussetzung: QGIS 3.28 oder neuer (vorbereitet für QGIS 4 / Qt6).
 
@@ -235,7 +248,7 @@ Voraussetzung: QGIS 3.28 oder neuer (vorbereitet für QGIS 4 / Qt6).
 - ~~Export der Fehlerliste nach Excel / GeoPackage~~ – erledigt in Version 0.3.0
 - ~~Processing-Algorithmus für Modelle und Stapelverarbeitung~~ – erledigt in Version 0.4.0
 - ~~Gespeicherte Einstellungen und englische Übersetzung~~ – erledigt in Version 0.5.0
-- Veröffentlichung im offiziellen QGIS-Plugin-Repository
+- ~~Veröffentlichung im offiziellen QGIS-Plugin-Repository~~ – erledigt in Version 1.0.1 (November 2026)
 
 ---
 
